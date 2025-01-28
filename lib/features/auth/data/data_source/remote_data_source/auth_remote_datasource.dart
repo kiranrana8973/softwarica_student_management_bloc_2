@@ -46,9 +46,27 @@ class AuthRemoteDataSource implements IAuthDataSource {
   }
 
   @override
-  Future<String> loginStudent(String username, String password) {
-    // TODO: implement loginStudent
-    throw UnimplementedError();
+  Future<String> loginStudent(String username, String password) async {
+    try {
+      Response response = await _dio.post(
+        ApiEndpoints.login,
+        data: {
+          "username": username,
+          "password": password,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final str = response.data['token'];
+        return str;
+      } else {
+        throw Exception(response.statusMessage);
+      }
+    } on DioException catch (e) {
+      throw Exception(e);
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 
   @override
