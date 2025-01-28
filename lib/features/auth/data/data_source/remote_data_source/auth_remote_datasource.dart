@@ -9,19 +9,6 @@ class AuthRemoteDataSource implements IAuthDataSource {
   final Dio _dio;
 
   AuthRemoteDataSource(this._dio);
-
-  @override
-  Future<AuthEntity> getCurrentUser() {
-    // TODO: implement getCurrentUser
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<String> loginStudent(String username, String password) {
-    // TODO: implement loginStudent
-    throw UnimplementedError();
-  }
-
   @override
   Future<void> registerStudent(AuthEntity student) async {
     try {
@@ -53,8 +40,47 @@ class AuthRemoteDataSource implements IAuthDataSource {
   }
 
   @override
-  Future<String> uploadProfilePicture(File file) {
-    // TODO: implement uploadProfilePicture
+  Future<AuthEntity> getCurrentUser() {
+    // TODO: implement getCurrentUser
     throw UnimplementedError();
+  }
+
+  @override
+  Future<String> loginStudent(String username, String password) {
+    // TODO: implement loginStudent
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> uploadProfilePicture(File file) async {
+    try {
+      String fileName = file.path.split('/').last;
+      FormData formData = FormData.fromMap(
+        {
+          'profilePicture': await MultipartFile.fromFile(
+            file.path,
+            filename: fileName,
+          ),
+        },
+      );
+
+      Response response = await _dio.post(
+        ApiEndpoints.uploadImage,
+        data: formData,
+      );
+
+      if (response.statusCode == 200) {
+        // Extract the image name from the response
+        final str = response.data['data'];
+
+        return str;
+      } else {
+        throw Exception(response.statusMessage);
+      }
+    } on DioException catch (e) {
+      throw Exception(e);
+    } catch (e) {
+      throw Exception(e);
+    }
   }
 }

@@ -66,5 +66,6 @@ class AuthApiModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => throw UnimplementedError();
+  List<Object?> get props =>
+      [id, fname, lname, image, phone, batch, courses, username, password];
 }
