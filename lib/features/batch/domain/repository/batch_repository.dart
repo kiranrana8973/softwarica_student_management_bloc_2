@@ -5,5 +5,7 @@ import 'package:softwarica_student_management_bloc/features/batch/domain/entity/
 abstract interface class IBatchRepository {
   Future<Either<Failure, List<BatchEntity>>> getBatches();
   Future<Either<Failure, void>> createBatch(BatchEntity batch);
-  Future<Either<Failure, void>> deleteBatch(String id);
+  Future<Either<Failure, void>> deleteBatch(String id, String? token);
 }
+
+

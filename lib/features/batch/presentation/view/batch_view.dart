@@ -59,16 +59,43 @@ class BatchView extends StatelessWidget {
                   return Expanded(
                     child: ListView.builder(
                       itemCount: state.batches.length,
-                      itemBuilder: (context, index) {
+                      itemBuilder: (BuildContext context, index) {
                         return ListTile(
                           title: Text(state.batches[index].batchName),
                           subtitle: Text(state.batches[index].batchId!),
                           trailing: IconButton(
                             icon: Icon(Icons.delete),
                             onPressed: () {
-                              context.read<BatchBloc>().add(
-                                    DeleteBatch(state.batches[index].batchId!),
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context2) {
+                                  return AlertDialog(
+                                    title: Text('Delete Batch'),
+                                    content: Text(
+                                        'Are you sure you want to delete ${state.batches[index].batchName} batch?'),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('Cancel'),
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text('Delete'),
+                                        onPressed: () {
+                                          context.read<BatchBloc>().add(
+                                                DeleteBatch(
+                                                  state.batches[index].batchId!,
+                                                ),
+                                              );
+
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                    ],
                                   );
+                                },
+                              );
                             },
                           ),
                         );

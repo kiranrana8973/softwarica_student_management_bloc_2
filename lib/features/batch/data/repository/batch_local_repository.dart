@@ -21,9 +21,9 @@ class BatchLocalRepository implements IBatchRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteBatch(String id) {
+  Future<Either<Failure, void>> deleteBatch(String id, String? token) {
     try {
-      _batchLocalDataSource.deleteBatch(id);
+      _batchLocalDataSource.deleteBatch(id, token);
       return Future.value(Right(null));
     } catch (e) {
       return Future.value(Left(LocalDatabaseFailure(message: e.toString())));

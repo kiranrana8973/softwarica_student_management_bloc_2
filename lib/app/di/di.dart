@@ -191,7 +191,10 @@ _initBatchDependencies() async {
   );
 
   getIt.registerLazySingleton<DeleteBatchUsecase>(
-    () => DeleteBatchUsecase(batchRepository: getIt<BatchRemoteRepository>()),
+    () => DeleteBatchUsecase(
+      batchRepository: getIt<BatchRemoteRepository>(),
+      tokenSharedPrefs: getIt<TokenSharedPrefs>(),
+    ),
   );
 
   // =========================== Bloc ===========================

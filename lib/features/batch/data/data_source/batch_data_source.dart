@@ -3,5 +3,5 @@ import 'package:softwarica_student_management_bloc/features/batch/domain/entity/
 abstract interface class IBatchDataSource {
   Future<List<BatchEntity>> getBatches();
   Future<void> createBatch(BatchEntity batch);
-  Future<void> deleteBatch(String id);
+  Future<void> deleteBatch(String id, String? token);
 }

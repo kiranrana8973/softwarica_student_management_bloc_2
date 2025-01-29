@@ -9,6 +9,7 @@ class AuthRemoteDataSource implements IAuthDataSource {
   final Dio _dio;
 
   AuthRemoteDataSource(this._dio);
+  
   @override
   Future<void> registerStudent(AuthEntity student) async {
     try {
@@ -27,7 +28,7 @@ class AuthRemoteDataSource implements IAuthDataSource {
         },
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 200) {
         return;
       } else {
         throw Exception(response.statusMessage);
