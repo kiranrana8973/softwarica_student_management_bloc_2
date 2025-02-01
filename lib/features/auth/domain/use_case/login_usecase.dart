@@ -14,10 +14,9 @@ class LoginParams extends Equatable {
     required this.password,
   });
 
-  // Initial Constructor
-  const LoginParams.initial()
-      : username = '',
-        password = '';
+  const LoginParams.empty()
+      : username = '_empty.string',
+        password = '_empty.string';
 
   @override
   List<Object> get props => [username, password];
@@ -48,5 +47,3 @@ class LoginUseCase implements UsecaseWithParams<String, LoginParams> {
     });
   }
 }
-
-

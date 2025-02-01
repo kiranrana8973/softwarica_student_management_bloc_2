@@ -9,6 +9,11 @@ class BatchEntity extends Equatable {
     required this.batchName,
   });
 
+// Create an empty constructor or Initial Constructor
+  const BatchEntity.empty()
+      : batchId = '_empty.batchId',
+        batchName = '_empty.batchName';
+
   @override
   List<Object?> get props => [batchId, batchName];
 }
