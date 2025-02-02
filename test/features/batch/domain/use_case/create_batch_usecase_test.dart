@@ -2,10 +2,9 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:softwarica_student_management_bloc/features/batch/domain/entity/batch_entity.dart';
-import 'package:softwarica_student_management_bloc/features/batch/domain/repository/batch_repository.dart';
 import 'package:softwarica_student_management_bloc/features/batch/domain/use_case/create_batch_usecase.dart';
 
-class MockBatchRepository extends Mock implements IBatchRepository {}
+import 'repository.mock.dart';
 
 void main() {
   late MockBatchRepository repository;
@@ -32,8 +31,11 @@ void main() {
     final result = await usecase(params);
 
     // Assert
-    expect(result, equals(const Right<dynamic, void>(null)));
+    // expect(result, equals(const Right<dynamic, void>(null)));
+    expect(result, Right(null));
+
     // Verify
+
     verify(() => repository.createBatch(any())).called(1);
 
     verifyNoMoreInteractions(repository);
