@@ -14,6 +14,7 @@ void main() {
     repository = MockBatchRepository();
     usecase = GetAllBatchUseCase(batchRepository: repository);
   });
+
   final tBatch = BatchEntity(
     batchId: '1',
     batchName: 'Test Batch',
