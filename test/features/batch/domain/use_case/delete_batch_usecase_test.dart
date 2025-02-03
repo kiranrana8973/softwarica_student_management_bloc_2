@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:softwarica_student_management_bloc/core/error/failure.dart';
 import 'package:softwarica_student_management_bloc/features/batch/domain/use_case/delete_batch_usecase.dart';
 
 import 'repository.mock.dart';
@@ -27,7 +28,8 @@ void main() {
     // Arrange
     when(() => tokenSharedPrefs.getToken())
         .thenAnswer((_) async => Right(token));
-    when(() => repository.deleteBatch(tBatchId, token)).thenAnswer(
+
+    when(() => repository.deleteBatch(any(), any())).thenAnswer(
       (_) async => Right(null),
     );
 
@@ -40,6 +42,40 @@ void main() {
     // Verify
     verify(() => tokenSharedPrefs.getToken()).called(1);
     verify(() => repository.deleteBatch(tBatchId, token)).called(1);
+
+    verifyNoMoreInteractions(repository);
+
+    verifyNoMoreInteractions(tokenSharedPrefs);
+  });
+
+  test('delete batch using id and check weather the id is batch1', () async {
+    // Arrange
+    when(() => tokenSharedPrefs.getToken())
+        .thenAnswer((_) async => Right(token));
+
+    when(() => repository.deleteBatch(any(), any())).thenAnswer(
+      (invocation) async {
+        final batchId = invocation.positionalArguments[0] as String;
+
+        if (batchId == 'batch1') {
+          return Right(null);
+        } else {
+          return Left(ApiFailure(
+            message: 'Batch not found',
+          ));
+        }
+      },
+    );
+
+    // Act
+    final result = await usecase(DeleteBatchParams(batchId: 'batch1'));
+
+    // Assert
+    expect(result, Right(null));
+
+    // Verify
+    verify(() => tokenSharedPrefs.getToken()).called(1);
+    verify(() => repository.deleteBatch('batch1', token)).called(1);
 
     verifyNoMoreInteractions(repository);
 

@@ -35,9 +35,12 @@ class BatchBloc extends Bloc<BatchEvent, BatchState> {
     emit(state.copyWith(isLoading: true));
     final result = await _getAllBatchUseCase.call();
     result.fold(
-      (failure) =>
-          emit(state.copyWith(isLoading: false, error: failure.message)),
-      (batches) => emit(state.copyWith(isLoading: false, batches: batches)),
+      (failure) {
+        emit(state.copyWith(isLoading: false, error: failure.message));
+      },
+      (batches) {
+        emit(state.copyWith(isLoading: false, batches: batches));
+      },
     );
   }
 

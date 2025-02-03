@@ -26,5 +26,3 @@ final class DeleteBatch extends BatchEvent {
   @override
   List<Object> get props => [batchId];
 }
-
-
