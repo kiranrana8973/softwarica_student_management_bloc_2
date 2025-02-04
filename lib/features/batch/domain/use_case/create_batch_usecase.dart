@@ -31,3 +31,4 @@ class CreateBatchUseCase implements UsecaseWithParams<void, CreateBatchParams> {
     );
   }
 }
+

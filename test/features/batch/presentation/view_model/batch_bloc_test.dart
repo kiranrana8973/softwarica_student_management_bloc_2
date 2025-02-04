@@ -15,13 +15,15 @@ class MockGetAllBatchUseCase extends Mock implements GetAllBatchUseCase {}
 
 class MockDeleteBatchUsecase extends Mock implements DeleteBatchUsecase {}
 
+// Before running this test , comment the load batches event in the BatchBloc
+
 void main() {
   late CreateBatchUseCase createBatchUseCase;
   late GetAllBatchUseCase getAllBatchUseCase;
   late DeleteBatchUsecase deleteBatchUseCase;
   late BatchBloc batchBloc;
 
-  setUpAll(() {
+  setUp(() {
     createBatchUseCase = MockCreateBatchUseCase();
     getAllBatchUseCase = MockGetAllBatchUseCase();
     deleteBatchUseCase = MockDeleteBatchUsecase();
@@ -46,6 +48,24 @@ void main() {
         return batchBloc;
       },
       act: (bloc) => bloc.add(LoadBatches()),
+      //skip: 1,
+      expect: () => [
+        BatchState.initial().copyWith(isLoading: true),
+        BatchState.initial().copyWith(isLoading: false, batches: lstBatches),
+      ],
+      verify: (_) {
+        verify(() => getAllBatchUseCase.call()).called(1);
+      },
+    );
+
+    blocTest<BatchBloc, BatchState>(
+      'emits [BatchState] with loaded batches when LoadBatches is added with skip 1',
+      build: () {
+        when(() => getAllBatchUseCase.call())
+            .thenAnswer((_) async => Right(lstBatches));
+        return batchBloc;
+      },
+      act: (bloc) => bloc.add(LoadBatches()),
       skip: 1,
       expect: () => [
         BatchState.initial().copyWith(isLoading: false, batches: lstBatches),
@@ -54,7 +74,6 @@ void main() {
         verify(() => getAllBatchUseCase.call()).called(1);
       },
     );
-
     blocTest<BatchBloc, BatchState>(
       'emits [BatchState] with error when LoadBatches fails',
       build: () {

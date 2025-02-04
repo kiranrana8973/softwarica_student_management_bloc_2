@@ -27,7 +27,7 @@ class BatchBloc extends Bloc<BatchEvent, BatchState> {
     on<DeleteBatch>(_onDeleteBatch);
 
     // Call this event whenever the bloc is created to load the batches
-    add(LoadBatches());
+    //add(LoadBatches());
   }
 
   Future<void> _onLoadBatches(
