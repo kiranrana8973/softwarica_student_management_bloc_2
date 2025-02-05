@@ -19,10 +19,6 @@ void main() {
   final params = CreateBatchParams.empty();
 
   test('should call the [BatchRepo.createBatch]', () async {
-    // Arrange : Stubbing the method , we are hijaccking the method
-    // Then return : Use wheh the method is not a Future
-    // Then answer : Use when the method is a Future
-
     when(() => repository.createBatch(any())).thenAnswer(
       (_) async => Right(null),
     );
@@ -31,13 +27,10 @@ void main() {
     final result = await usecase(params);
 
     // Assert
-    // expect(result, equals(const Right<dynamic, void>(null)));
     expect(result, Right(null));
 
     // Verify
-
     verify(() => repository.createBatch(any())).called(1);
-
     verifyNoMoreInteractions(repository);
   });
 }

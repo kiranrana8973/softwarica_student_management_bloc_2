@@ -18,7 +18,9 @@ void main() {
     usecase = LoginUseCase(repository, tokenSharedPrefs);
   });
 
-  test('should call the [AuthRepo.login]', () async {
+  test(
+      'should call the [AuthRepo.login] with correct usename and password (kiran, kiran123)',
+      () async {
     when(() => repository.loginStudent(any(), any())).thenAnswer(
       (invocation) async {
         final username = invocation.positionalArguments[0] as String;
@@ -48,6 +50,11 @@ void main() {
 
     verifyNoMoreInteractions(repository);
     verifyNoMoreInteractions(tokenSharedPrefs);
+  });
+
+  tearDown(() {
+    reset(repository);
+    reset(tokenSharedPrefs);
   });
 }
 

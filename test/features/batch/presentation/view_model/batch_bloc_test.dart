@@ -9,13 +9,13 @@ import 'package:softwarica_student_management_bloc/features/batch/domain/use_cas
 import 'package:softwarica_student_management_bloc/features/batch/domain/use_case/get_all_batch_usecase.dart';
 import 'package:softwarica_student_management_bloc/features/batch/presentation/view_model/batch_bloc.dart';
 
+// Before running this test , comment the load batches event in the BatchBloc
+
 class MockCreateBatchUseCase extends Mock implements CreateBatchUseCase {}
 
 class MockGetAllBatchUseCase extends Mock implements GetAllBatchUseCase {}
 
 class MockDeleteBatchUsecase extends Mock implements DeleteBatchUsecase {}
-
-// Before running this test , comment the load batches event in the BatchBloc
 
 void main() {
   late CreateBatchUseCase createBatchUseCase;
@@ -48,7 +48,6 @@ void main() {
         return batchBloc;
       },
       act: (bloc) => bloc.add(LoadBatches()),
-      //skip: 1,
       expect: () => [
         BatchState.initial().copyWith(isLoading: true),
         BatchState.initial().copyWith(isLoading: false, batches: lstBatches),
@@ -90,5 +89,9 @@ void main() {
         verify(() => getAllBatchUseCase.call()).called(1);
       },
     );
+  });
+
+  tearDown(() {
+    batchBloc.close();
   });
 }

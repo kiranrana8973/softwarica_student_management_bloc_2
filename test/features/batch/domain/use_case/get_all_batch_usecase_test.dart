@@ -18,11 +18,17 @@ void main() {
   final tBatch = BatchEntity(
     batchId: '1',
     batchName: 'Test Batch',
-    // add other properties
   );
+
+  final tBatch2 = BatchEntity(
+    batchId: '2',
+    batchName: 'Test Batch 2',
+  );
+
+  final tBatches = [tBatch, tBatch2];
+
   test('should get batches from repository', () async {
     // Arrange
-    final tBatches = [tBatch];
     when(() => repository.getBatches())
         .thenAnswer((_) async => Right(tBatches));
 
@@ -30,7 +36,11 @@ void main() {
     final result = await usecase();
 
     // Assert
-    verify(() => repository.getBatches()).called(1);
     expect(result, Right(tBatches));
+
+    // Verify
+    verify(() => repository.getBatches()).called(1);
   });
 }
+
+
