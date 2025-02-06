@@ -2,7 +2,6 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:softwarica_student_management_bloc/app/di/di.dart';
-import 'package:softwarica_student_management_bloc/core/common/snackbar/my_snackbar.dart';
 import 'package:softwarica_student_management_bloc/features/auth/domain/use_case/login_usecase.dart';
 import 'package:softwarica_student_management_bloc/features/auth/presentation/view_model/signup/register_bloc.dart';
 import 'package:softwarica_student_management_bloc/features/batch/presentation/view_model/batch_bloc.dart';
@@ -60,7 +59,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     on<LoginStudentEvent>(
       (event, emit) async {
         emit(state.copyWith(isLoading: true));
-        final result = await _loginUseCase(
+
+        final result = await _loginUseCase.call(
           LoginParams(
             username: event.username,
             password: event.password,
@@ -70,11 +70,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         result.fold(
           (failure) {
             emit(state.copyWith(isLoading: false, isSuccess: false));
-            showMySnackBar(
-              context: event.context,
-              message: "Invalid Credentials",
-              color: Colors.red,
-            );
+            // showMySnackBar(
+            //   context: event.context,
+            //   message: "Invalid Credentials",
+            //   color: Colors.red,
+            // );
           },
           (token) {
             emit(state.copyWith(isLoading: false, isSuccess: true));

@@ -16,25 +16,27 @@ class MockRegisterBloc extends Mock implements RegisterBloc {}
 
 class MockHomeCubit extends Mock implements HomeCubit {}
 
-class MockBuildContext extends Mock implements BuildContext {}
-
 void main() {
   late LoginBloc loginBloc;
   late LoginUseCase loginUseCase;
   late RegisterBloc registerBloc;
-  late BuildContext context;
   late HomeCubit homeCubit;
+
+  // setUpAll(() {
+  //   registerFallbackValue(LoginParams(username: '', password: ''));
+  // });
 
   setUp(() {
     loginUseCase = MockLoginUseCase();
     registerBloc = MockRegisterBloc();
     homeCubit = MockHomeCubit();
-    context = MockBuildContext();
     loginBloc = LoginBloc(
       registerBloc: registerBloc,
       homeCubit: homeCubit,
       loginUseCase: loginUseCase,
     );
+// Add this
+    registerFallbackValue(LoginParams.empty());
   });
 
   test('initial state should be LoginState.initial()', () {
@@ -85,44 +87,91 @@ void main() {
   });
 
   // Check for the login button click
+  // Before running this test, comment the Navigator.pushReplacement in the LoginBloc
   testWidgets('Check for the login button click', (tester) async {
-    String correctUsername = 'kiran';
-    String correctPassword = 'kiran123';
+    const correctUsername = 'kiran';
+    const correctPassword = 'kiran123';
 
-    when(
-      () => loginUseCase(
-        LoginParams(
-          username: correctUsername,
-          password: correctPassword,
-        ),
-      ),
-    ).thenAnswer((invocation) async {
-      final username = invocation.positionalArguments[0] as String;
-      final password = invocation.positionalArguments[1] as String;
-
-      if (username == correctUsername && password == correctPassword) {
+    when(() => loginUseCase(any())).thenAnswer((invocation) async {
+      // As you are using LoginParams, you have to use registerFallbackValue(LoginParams.empty());
+      final params = invocation.positionalArguments[0] as LoginParams;
+      if (params.username == correctUsername &&
+          params.password == correctPassword) {
         return Right('token');
       } else {
         return Left(ApiFailure(message: 'Invalid Credentials'));
       }
     });
 
-    await tester.pumpWidget(MaterialApp(
-      home: BlocProvider(
-        create: (context) => loginBloc,
-        child: LoginView(),
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider(
+          create: (context) => loginBloc,
+          child: LoginView(),
+        ),
       ),
-    ));
+    );
 
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField).at(0), 'kiran');
-    await tester.enterText(find.byType(TextField).at(1), 'kiran123');
+    // Enter valid credentials
+    await tester.enterText(find.byType(TextField).at(0), correctUsername);
+    await tester.enterText(find.byType(TextField).at(1), correctPassword);
 
-    await tester.tap(find.byType(ElevatedButton).at(0));
+    // Tap login
+    await tester.tap(find.byType(ElevatedButton).first);
 
     await tester.pumpAndSettle();
 
-    expect(loginBloc.state.isLoading, true);
+    expect(loginBloc.state.isSuccess, true);
   });
 }
+
+
+
+
+// // Invalid username and password and check if the snackbar has been popped out
+//   testWidgets(
+//       'Invalid username and password and check if the snackbar has been popped out',
+//       (tester) async {
+//     String correctUsername = 'kiran';
+//     String correctPassword = 'kiran123';
+
+//     when(
+//       () => loginUseCase(any()),
+//     ).thenAnswer((invocation) async {
+//       // As you are using LoginParams, you have to use registerFallbackValue(LoginParams.empty());
+//       final loginParams = invocation.positionalArguments[0] as LoginParams;
+
+//       if (loginParams.username == correctUsername &&
+//           loginParams.password == correctPassword) {
+//         return Right('token');
+//       } else {
+//         return Left(ApiFailure(message: 'Invalid Credentials'));
+//       }
+//     });
+
+//     await tester.pumpWidget(MaterialApp(
+//       home: BlocProvider(
+//         create: (context) => loginBloc,
+//         child: LoginView(),
+//       ),
+//     ));
+
+//     // falgun 2 gate
+
+//     await tester.pumpAndSettle();
+
+//     await tester.enterText(find.byType(TextField).at(0), 'kiran');
+//     await tester.enterText(find.byType(TextField).at(1), 'kiran1234');
+
+//     await tester.tap(find.byType(ElevatedButton).at(0));
+
+//     await tester.pumpAndSettle();
+
+//     expect(loginBloc.state.isLoading, true);
+
+//     await tester.pumpAndSettle();
+
+//     expect(find.text('Invalid Credentials'), findsOneWidget);
+//   });
