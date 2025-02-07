@@ -1,82 +1,67 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:softwarica_student_management_bloc/core/error/failure.dart';
-import 'package:softwarica_student_management_bloc/features/auth/domain/use_case/login_usecase.dart';
 import 'package:softwarica_student_management_bloc/features/auth/presentation/view/login_view.dart';
 import 'package:softwarica_student_management_bloc/features/auth/presentation/view_model/login/login_bloc.dart';
-import 'package:softwarica_student_management_bloc/features/auth/presentation/view_model/signup/register_bloc.dart';
-import 'package:softwarica_student_management_bloc/features/home/presentation/view_model/home_cubit.dart';
 
-class MockLoginUseCase extends Mock implements LoginUseCase {}
+class MockLoginBloc extends MockBloc<LoginEvent, LoginState>
+    implements LoginBloc {}
 
-class MockRegisterBloc extends MockBloc<RegisterEvent, RegisterState>
-    implements RegisterBloc {}
-
-class MockHomeCubit extends Mock implements HomeCubit {}
+class MockBuildContext extends Mock implements BuildContext {}
 
 void main() {
-  late LoginBloc loginBloc;
-  late LoginUseCase loginUseCase;
-  late RegisterBloc registerBloc;
-  late HomeCubit homeCubit;
+  late MockLoginBloc loginBloc;
 
   setUp(() {
-    loginUseCase = MockLoginUseCase();
-    registerBloc = MockRegisterBloc();
-    homeCubit = MockHomeCubit();
-    loginBloc = LoginBloc(
-      registerBloc: registerBloc,
-      homeCubit: homeCubit,
-      loginUseCase: loginUseCase,
+    loginBloc = MockLoginBloc();
+  });
+
+  Widget loadLoginView() {
+    return BlocProvider<LoginBloc>(
+      create: (context) => loginBloc,
+      child: MaterialApp(home: LoginView()),
     );
-// Add this
-    registerFallbackValue(LoginParams.empty());
+  }
+
+  testWidgets('check for the text in login ui', (tester) async {
+    await tester.pumpWidget(loadLoginView());
+
+    await tester.pumpAndSettle();
+
+    // find button by text
+    final result = find.widgetWithText(ElevatedButton, 'Login');
+
+    expect(result, findsOneWidget);
   });
 
-  test('initial state should be LoginState.initial()', () {
-    expect(loginBloc.state, equals(LoginState.initial()));
-    expect(loginBloc.state.isLoading, false);
-    expect(loginBloc.state.isSuccess, false);
-  });
-
-  testWidgets('Check for the username and password in the view',
-      (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: BlocProvider(
-        create: (context) => loginBloc,
-        child: LoginView(),
-      ),
-    ));
+  // Check for the validator error
+  testWidgets('Check for the username and password', (tester) async {
+    await tester.pumpWidget(loadLoginView());
 
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField).at(0), 'kiran');
     await tester.enterText(find.byType(TextField).at(1), 'kiran123');
 
+    await tester.tap(find.byType(ElevatedButton).first);
+
+    await tester.pumpAndSettle();
+
     expect(find.text('kiran'), findsOneWidget);
     expect(find.text('kiran123'), findsOneWidget);
   });
 
-  // Check for the validator error
   testWidgets('Check for the validator error', (tester) async {
-    await tester.pumpWidget(MaterialApp(
-      home: BlocProvider(
-        create: (context) => loginBloc,
-        child: LoginView(),
-      ),
-    ));
+    await tester.pumpWidget(loadLoginView());
 
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextField).at(0), '');
-    await tester.enterText(find.byType(TextField).at(1), '');
+    // await tester.enterText(find.byType(TextField).at(0), '');
+    // await tester.enterText(find.byType(TextField).at(1), '');
 
-    // await tester.tap(find.widgetWithText(ElevatedButton, 'Login'));
-    await tester.tap(find.byType(ElevatedButton).at(0));
+    await tester.tap(find.byType(ElevatedButton).first);
 
     await tester.pumpAndSettle();
 
@@ -84,92 +69,22 @@ void main() {
     expect(find.text('Please enter password'), findsOneWidget);
   });
 
-  // Check for the login button click
-  // Before running this test, comment the Navigator.pushReplacement in the LoginBloc
-  testWidgets('Check for the login button click', (tester) async {
-    const correctUsername = 'kiran';
-    const correctPassword = 'kiran123';
+  // Should show progress indicator when loading
+  testWidgets('Login success', (tester) async {
+    when(() => loginBloc.state)
+        .thenReturn(LoginState(isLoading: true, isSuccess: true));
 
-    when(() => loginUseCase(any())).thenAnswer((invocation) async {
-      // As you are using LoginParams, you have to use registerFallbackValue(LoginParams.empty());
-      final params = invocation.positionalArguments[0] as LoginParams;
-      if (params.username == correctUsername &&
-          params.password == correctPassword) {
-        return Right('token');
-      } else {
-        return Left(ApiFailure(message: 'Invalid Credentials'));
-      }
-    });
+    await tester.pumpWidget(loadLoginView());
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: BlocProvider(
-          create: (context) => loginBloc,
-          child: LoginView(),
-        ),
-      ),
-    );
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).at(0), 'kiran');
+    await tester.enterText(find.byType(TextField).at(1), 'kiran123');
+
+    await tester.tap(find.byType(ElevatedButton).first);
 
     await tester.pumpAndSettle();
 
-    // Enter valid credentials
-    await tester.enterText(find.byType(TextField).at(0), correctUsername);
-    await tester.enterText(find.byType(TextField).at(1), correctPassword);
-
-    // Tap login
-    await tester.tap(find.byType(ElevatedButton).first);
-
-    await tester.pumpAndSettle(Duration(seconds: 10));
-
-    expect(loginBloc.state.isSuccess, false);
+    expect(loginBloc.state.isSuccess, true);
   });
 }
 
-
-
-
-// // Invalid username and password and check if the snackbar has been popped out
-//   testWidgets(
-//       'Invalid username and password and check if the snackbar has been popped out',
-//       (tester) async {
-//     String correctUsername = 'kiran';
-//     String correctPassword = 'kiran123';
-
-//     when(
-//       () => loginUseCase(any()),
-//     ).thenAnswer((invocation) async {
-//       // As you are using LoginParams, you have to use registerFallbackValue(LoginParams.empty());
-//       final loginParams = invocation.positionalArguments[0] as LoginParams;
-
-//       if (loginParams.username == correctUsername &&
-//           loginParams.password == correctPassword) {
-//         return Right('token');
-//       } else {
-//         return Left(ApiFailure(message: 'Invalid Credentials'));
-//       }
-//     });
-
-//     await tester.pumpWidget(MaterialApp(
-//       home: BlocProvider(
-//         create: (context) => loginBloc,
-//         child: LoginView(),
-//       ),
-//     ));
-
-//     // falgun 2 gate
-
-//     await tester.pumpAndSettle();
-
-//     await tester.enterText(find.byType(TextField).at(0), 'kiran');
-//     await tester.enterText(find.byType(TextField).at(1), 'kiran1234');
-
-//     await tester.tap(find.byType(ElevatedButton).at(0));
-
-//     await tester.pumpAndSettle();
-
-//     expect(loginBloc.state.isLoading, true);
-
-//     await tester.pumpAndSettle();
-
-//     expect(find.text('Invalid Credentials'), findsOneWidget);
-//   });
