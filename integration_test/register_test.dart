@@ -2,6 +2,7 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:softwarica_student_management_bloc/features/auth/presentation/view/register_view.dart';
@@ -24,6 +25,8 @@ class MockRegisterBloc extends MockBloc<RegisterEvent, RegisterState>
     implements RegisterBloc {}
 
 void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
   late MockBatchBloc batchBloc;
   late MockCourseBloc courseBloc;
   late MockRegisterBloc registerBloc;

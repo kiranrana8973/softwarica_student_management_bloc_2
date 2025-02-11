@@ -9,8 +9,6 @@ import 'package:softwarica_student_management_bloc/features/auth/presentation/vi
 class MockLoginBloc extends MockBloc<LoginEvent, LoginState>
     implements LoginBloc {}
 
-class MockBuildContext extends Mock implements BuildContext {}
-
 void main() {
   late MockLoginBloc loginBloc;
 
@@ -87,4 +85,3 @@ void main() {
     expect(loginBloc.state.isSuccess, true);
   });
 }
-

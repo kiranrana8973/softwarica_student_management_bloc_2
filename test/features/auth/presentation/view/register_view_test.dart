@@ -172,5 +172,3 @@ void main() {
     expect(registerBloc.state.isSuccess, true);
   });
 }
-
-
